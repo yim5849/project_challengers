@@ -4,5 +4,34 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
 	
 	<!-- Root Context: defines shared resources visible to all other web components -->
+	<!-- bean을 지칭하는 명칭  / class : 불러오고자 하는 class명-->
+		<bean id="realDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+			<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"></property>
+			<property name="url" value="jdbc:oracle:thin:@61.78.121.242:8877:xe"></property>
+			<property name="username" value="jjajo"></property>
+			<property name="password" value="jjajo"></property>
+		</bean>
+		
+		<bean id="dataSource" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+		<constructor-arg ref="realDataSource"/>
+			<property name="logFormatter">
+				<bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
+					<property name="loggingType" value="MULTI_LINE"/>
+					<property name="sqlPrefix" value="[SQL]"/>
+				</bean>
+			</property>
+		</bean>
+		
+		<bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+			<property name="dataSource" ref="dataSource"/>
+			<property name="configLocation" value="classpath:mybatis-config.xml"/>
+			<property name="mapperLocations" value="classpath*:mapper/**/*.xml"/>
+		</bean>
+		
+		<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+			<constructor-arg index="0" ref="sqlSessionFactoryBean"/>
+		</bean>	
+		
+		
 		
 </beans>
